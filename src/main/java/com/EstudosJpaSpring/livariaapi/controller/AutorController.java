@@ -1,6 +1,8 @@
 package com.EstudosJpaSpring.livariaapi.controller;
 
 import com.EstudosJpaSpring.livariaapi.controller.dto.AutorDTO;
+import com.EstudosJpaSpring.livariaapi.controller.dto.ErroResposta;
+import com.EstudosJpaSpring.livariaapi.exception.RegistorDuplicadoAutor;
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.sefvice.AutorService;
 import org.springframework.http.HttpStatus;
@@ -25,13 +27,19 @@ public class AutorController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> salvar(@RequestBody AutorDTO autor){
-        Autor autorDto = autor.mapearAutor();
+    public ResponseEntity<Object> salvar(@RequestBody AutorDTO autor){
+
+        try {
+            Autor autorDto = autor.mapearAutor();
+
         service.salvar(autorDto);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(autorDto.getId()).toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).build();} catch (RegistorDuplicadoAutor e){
+            var erroResposta = ErroResposta.respostaConflito(e.getMessage());
+            return ResponseEntity.status(erroResposta.status()).body(erroResposta);
+        }
     }
 
     @GetMapping("{id}")
