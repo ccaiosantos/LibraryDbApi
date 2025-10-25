@@ -30,11 +30,11 @@ class LivroRepositoryTest {
         livro.setGenero(GeneroLivro.AVENTURA);
         livro.setDataPublicacao(LocalDate.of(2005,8,10));
        Autor autor = autorRepository
-                .findById(UUID.fromString("6a0e310f-e712-4f21-9c2d-6f612eadc625")).orElse(null);
+                .findById(UUID.fromString("d61b9870-e17f-4fa2-9430-ed7b5a560e21")).orElse(null);
         livro.setAutor(autor);
-        livro.setAutor(new Autor());
 
         repository.save(livro);
+
 
 
 

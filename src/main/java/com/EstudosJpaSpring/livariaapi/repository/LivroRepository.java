@@ -17,6 +17,7 @@ import java.util.UUID;
 
 
 public interface LivroRepository extends JpaRepository<Livro, UUID> {
+    boolean existsByAutor(Autor autor);
     //QUERY METHOD/USE O FINDBY QUANDO QUISER TRAZER DADOS DE ALGUMA IDENTIDADE, UM METODO ESPECIFICO DE CONSULTA
     List<Livro> findByAutor(Autor autor);
 

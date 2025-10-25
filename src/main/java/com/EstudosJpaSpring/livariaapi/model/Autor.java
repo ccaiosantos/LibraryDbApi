@@ -43,7 +43,8 @@ public class Autor {
     private UUID idUsuario;
 
 
-    @OneToMany(mappedBy = "autor")
+    @OneToMany(mappedBy = "autor", fetch = FetchType.LAZY)
+            //cascade = CascadeType.ALL)
     private List<Livro> livros;
 
     public Autor(){

@@ -1,8 +1,12 @@
 package com.EstudosJpaSpring.livariaapi.controller;
 
 import com.EstudosJpaSpring.livariaapi.controller.dto.AutorDTO;
+import com.EstudosJpaSpring.livariaapi.controller.dto.ErroResposta;
+import com.EstudosJpaSpring.livariaapi.exception.OperacaoNaoPermitidaException;
+import com.EstudosJpaSpring.livariaapi.exception.RegistorDuplicadoAutor;
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.sefvice.AutorService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/autores")
+@RequiredArgsConstructor
 public class AutorController {
 
     private AutorService service;
@@ -25,15 +30,16 @@ public class AutorController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> salvar(@RequestBody AutorDTO autor){
-        Autor autorDto = autor.mapearAutor();
+    public ResponseEntity<Object> salvar(@RequestBody AutorDTO autor){
+
+        try {Autor autorDto = autor.mapearAutor();
         service.salvar(autorDto);
-
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(autorDto.getId()).toUri();
-
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).build();} catch (RegistorDuplicadoAutor e){
+            var erroResposta = ErroResposta.respostaConflito(e.getMessage());
+            return ResponseEntity.status(erroResposta.status()).body(erroResposta);
+        }
     }
-
     @GetMapping("{id}")
     public ResponseEntity obterDadosAutor(@PathVariable String id){
         var idAutor = UUID.fromString(id);
@@ -48,13 +54,17 @@ public class AutorController {
     }
 
     @DeleteMapping("{id}")//void por que não vai retornar nada
-    public ResponseEntity<Void> deletarAutor(@PathVariable String id){
+    public ResponseEntity<Object> deletarAutor(@PathVariable String id){
+        try{
         var idAutor = UUID.fromString(id);
         Optional<Autor> autorOptional = service.obterPorId(idAutor);
         if (autorOptional.isEmpty()){
             return ResponseEntity.notFound().build();
         }service.deletarPorId(autorOptional.get());
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.notFound().build();} catch (OperacaoNaoPermitidaException o){
+            var erroResposta = ErroResposta.respostaPadrao(o.getMessage());
+            return  ResponseEntity.status(erroResposta.status()).body(erroResposta);
+        }
 
     }
     @GetMapping
@@ -64,8 +74,11 @@ public class AutorController {
         return ResponseEntity.ok(autorDto);
     }
     @PutMapping("{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable String id,@RequestBody AutorDTO autorDTO){
-        var idAutor = UUID.fromString(id);
+    public ResponseEntity<Object> atualizar(@PathVariable String id,@RequestBody AutorDTO autorDTO){
+
+        try {
+            var idAutor = UUID.fromString(id);
+
         Optional<Autor> autorOptional = service.obterPorId(idAutor);
         if (autorOptional.isEmpty()){
             return ResponseEntity.notFound().build();
@@ -75,7 +88,11 @@ public class AutorController {
         autor.setNacionalidade(autorDTO.nacionalidade());
         autor.setDataNascimento(autorDTO.dataNascimento());
         service.atualizar(autor);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();}catch (RegistorDuplicadoAutor e){
+            var erroResposta = ErroResposta.respostaConflito(e.getMessage());
+            return ResponseEntity.status(erroResposta.status()).body(erroResposta);
+
+        }
     }
 
 }
