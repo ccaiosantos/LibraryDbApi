@@ -1,11 +1,7 @@
 package com.EstudosJpaSpring.livariaapi.sefvice;
 
-import com.EstudosJpaSpring.livariaapi.exception.OperacaoNaoPermitidaException;
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.repository.AutorRepository;
-import com.EstudosJpaSpring.livariaapi.repository.LivroRepository;
-import com.EstudosJpaSpring.livariaapi.validador.AutorValidado;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,15 +9,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class AutorService {
     private final AutorRepository repository;
-    private final AutorValidado validado;
-    private final LivroRepository livroRepository;
 
+    public AutorService(AutorRepository repository){
+        this.repository = repository;
+    }
 
     public Autor salvar(Autor autor){
-        validado.validar(autor);
         return repository.save(autor);
     }
 
@@ -29,7 +24,6 @@ public class AutorService {
         if (autor.getId() == null){
             throw new IllegalArgumentException("Não Existe Autor para atualizar"); //throw new é lançar
         }
-        validado.validar(autor);
         repository.save(autor);
     }
 
@@ -38,9 +32,6 @@ public class AutorService {
     }
 
     public void deletarPorId(Autor autor){
-        if (possuiLivro(autor)){
-            throw new OperacaoNaoPermitidaException("Autor possui livro e nãopode ser excluido");
-        }
         repository.delete(autor);
     }
     public List<Autor> pesquisa(String nome, String nacionalidade){
@@ -53,10 +44,5 @@ public class AutorService {
             return repository.findByNome(nacionalidade);
         }
         return repository.findAll();
-    }
-
-    public boolean possuiLivro(Autor autor){
-        return livroRepository.existsByAutor(autor);
-
     }
 }
