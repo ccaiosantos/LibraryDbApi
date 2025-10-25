@@ -3,6 +3,7 @@ package com.EstudosJpaSpring.livariaapi.controller;
 import com.EstudosJpaSpring.livariaapi.controller.dto.AutorDTO;
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.sefvice.AutorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class AutorController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> salvar(@RequestBody AutorDTO autor){
+    public ResponseEntity<Void> salvar(@RequestBody @Valid AutorDTO autor){
         Autor autorDto = autor.mapearAutor();
         service.salvar(autorDto);
 
@@ -59,12 +60,12 @@ public class AutorController {
     }
     @GetMapping
     public ResponseEntity<List<AutorDTO>> pesquisa(@RequestParam(value = "nome", required = false) String nome,@RequestParam(value = "nacionalidade", required = false) String nacionalidade){
-        List<Autor> resultado = service.pesquisa(nome, nacionalidade);
+        List<Autor> resultado = service.pesquisaExample(nome, nacionalidade);
         List<AutorDTO> autorDto = resultado.stream().map(autor -> new AutorDTO(autor.getId(),autor.getNome(),autor.getDataNascimento(),autor.getNacionalidade())).collect(Collectors.toList());
         return ResponseEntity.ok(autorDto);
     }
     @PutMapping("{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable String id,@RequestBody AutorDTO autorDTO){
+    public ResponseEntity<Void> atualizar(@PathVariable String id,@RequestBody @Valid AutorDTO autorDTO){
         var idAutor = UUID.fromString(id);
         Optional<Autor> autorOptional = service.obterPorId(idAutor);
         if (autorOptional.isEmpty()){

@@ -2,6 +2,8 @@ package com.EstudosJpaSpring.livariaapi.sefvice;
 
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.repository.AutorRepository;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,15 +36,24 @@ public class AutorService {
     public void deletarPorId(Autor autor){
         repository.delete(autor);
     }
-    public List<Autor> pesquisa(String nome, String nacionalidade){
-        if (nome !=  null && nacionalidade != null){
-            return repository.findByNomeAndNacionalidade(nome,nacionalidade);
-        }
-        if(nome != null){
-            return repository.findByNome(nome);
-        }if(nacionalidade != null){
-            return repository.findByNome(nacionalidade);
-        }
-        return repository.findAll();
+//    public List<Autor> pesquisa(String nome, String nacionalidade){
+//        if (nome !=  null && nacionalidade != null){
+//            return repository.findByNomeAndNacionalidade(nome,nacionalidade);
+//        }
+//        if(nome != null){
+//            return repository.findByNome(nome);
+//        }if(nacionalidade != null){
+//            return repository.findByNome(nacionalidade);
+//        }
+//        return repository.findAll();
+//    }
+
+    public List<Autor> pesquisaExample(String nome, String nacionalidade){
+        Autor autor = new Autor();
+        autor.setNome(nome);
+        autor.setNacionalidade(nacionalidade);
+        ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreNullValues().withIgnoreCase().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example<Autor> autorExample = Example.of(autor, matcher);
+        return repository.findAll(autorExample);  //buscar todos os autores que atendam a esse autorExample que fiz a pesquisa
     }
 }
