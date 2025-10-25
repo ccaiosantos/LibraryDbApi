@@ -6,7 +6,9 @@ import com.EstudosJpaSpring.livariaapi.exception.OperacaoNaoPermitidaException;
 import com.EstudosJpaSpring.livariaapi.exception.RegistorDuplicadoAutor;
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.sefvice.AutorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +27,9 @@ public class AutorController {
 
     private AutorService service;
 
-    public AutorController(AutorService service){
-        this.service = service;
-    }
 
     @PostMapping
-    public ResponseEntity<Object> salvar(@RequestBody AutorDTO autor){
+    public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDTO autor){
 
         try {Autor autorDto = autor.mapearAutor();
         service.salvar(autorDto);
