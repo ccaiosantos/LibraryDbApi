@@ -33,9 +33,11 @@ public class Autor {
 
     @Column(name = "nacionalidade", length = 50, nullable = false)
     private String nacionalidade;
+
     @CreatedDate
     @Column(name="data_cadastro")
     private LocalDateTime dataCadastro;
+
     @LastModifiedDate
     @Column(name="data_atualizacao")
     private LocalDateTime dataCAtualizacao;

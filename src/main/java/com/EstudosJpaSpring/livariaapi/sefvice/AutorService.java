@@ -2,6 +2,7 @@ package com.EstudosJpaSpring.livariaapi.sefvice;
 
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.repository.AutorRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
@@ -11,12 +12,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AutorService {
     private final AutorRepository repository;
-
-    public AutorService(AutorRepository repository){
-        this.repository = repository;
-    }
 
     public Autor salvar(Autor autor){
         return repository.save(autor);
