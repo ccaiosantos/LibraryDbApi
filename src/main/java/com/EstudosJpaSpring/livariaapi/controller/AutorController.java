@@ -1,9 +1,11 @@
 package com.EstudosJpaSpring.livariaapi.controller;
 
 import com.EstudosJpaSpring.livariaapi.controller.dto.AutorDTO;
+import com.EstudosJpaSpring.livariaapi.controller.mappers.AutorMapper;
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.sefvice.AutorService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,20 +19,20 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/autores")
+@RequiredArgsConstructor
 public class AutorController {
 
     private AutorService service;
+    private AutorMapper mapper;
 
-    public AutorController(AutorService service){
-        this.service = service;
-    }
+
 
     @PostMapping
-    public ResponseEntity<Void> salvar(@RequestBody @Valid AutorDTO autor){
-        Autor autorDto = autor.mapearAutor();
-        service.salvar(autorDto);
+    public ResponseEntity<Void> salvar(@RequestBody @Valid AutorDTO dto){
+        Autor autor = mapper.toEntity(dto);
+        service.salvar(autor);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(autorDto.getId()).toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("{id}").buildAndExpand(autor.getId()).toUri();
 
         return ResponseEntity.created(location).build();
     }
@@ -39,11 +41,25 @@ public class AutorController {
     public ResponseEntity obterDadosAutor(@PathVariable String id){
         var idAutor = UUID.fromString(id);
         Optional<Autor> autorOptional= service.obterPorId(idAutor);
-        if (autorOptional.isPresent()){
-            Autor autor = autorOptional.get();
-            AutorDTO autorDTO = new AutorDTO(autor.getId(), autor.getNome(), autor.getDataNascimento(), autor.getNacionalidade());
-            return ResponseEntity.ok(autorDTO);
-        } return ResponseEntity.notFound().build();
+        return service
+                .obterPorId(idAutor)
+                .map(autor -> {
+                AutorDTO dto = mapper.toDto(autor);
+                return ResponseEntity.ok(dto);
+
+        }).orElseGet( () ->  ResponseEntity.notFound().build() );
+//        if (autorOptional.isPresent()){
+//            Autor autor = autorOptional.get();
+//            AutorDTO autorDTO = mapper.toDto(autor);
+
+
+//            new AutorDTO(autor.getId(), //para estudo
+//                    autor.getNome(),
+//                    autor.getDataNascimento(),
+//                    autor.getNacionalidade());
+
+//         return ResponseEntity.ok(autorDTO);
+//        } return ResponseEntity.notFound().build();
 
 
     }
@@ -61,7 +77,7 @@ public class AutorController {
     @GetMapping
     public ResponseEntity<List<AutorDTO>> pesquisa(@RequestParam(value = "nome", required = false) String nome,@RequestParam(value = "nacionalidade", required = false) String nacionalidade){
         List<Autor> resultado = service.pesquisaExample(nome, nacionalidade);
-        List<AutorDTO> autorDto = resultado.stream().map(autor -> new AutorDTO(autor.getId(),autor.getNome(),autor.getDataNascimento(),autor.getNacionalidade())).collect(Collectors.toList());
+        List<AutorDTO> autorDto = resultado.stream().map(mapper::toDto).collect(Collectors.toList());
         return ResponseEntity.ok(autorDto);
     }
     @PutMapping("{id}")
