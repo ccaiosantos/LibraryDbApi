@@ -3,7 +3,9 @@ package com.EstudosJpaSpring.livariaapi.repository;
 import com.EstudosJpaSpring.livariaapi.model.Autor;
 import com.EstudosJpaSpring.livariaapi.model.GeneroLivro;
 import com.EstudosJpaSpring.livariaapi.model.Livro;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +18,7 @@ import java.util.UUID;
 
 
 
-public interface LivroRepository extends JpaRepository<Livro, UUID> {
+public interface LivroRepository extends JpaRepository<Livro, UUID>, JpaSpecificationExecutor<Livro> {
     boolean existsByAutor(Autor autor);
     //QUERY METHOD/USE O FINDBY QUANDO QUISER TRAZER DADOS DE ALGUMA IDENTIDADE, UM METODO ESPECIFICO DE CONSULTA
     List<Livro> findByAutor(Autor autor);

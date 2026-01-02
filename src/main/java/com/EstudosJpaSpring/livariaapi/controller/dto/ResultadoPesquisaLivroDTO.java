@@ -15,8 +15,8 @@ public record ResultadoPesquisaLivroDTO(
 
                                         @NotBlank String isbn,
                                         @NotBlank String titulo,
-                                        @NotNull @Past LocalDate dataPublicacao,
+                                        @NotNull @Past LocalDate anoPublicacao,
                                         GeneroLivro genero,
                                         BigDecimal preco,
-                                        AutorDTO autor) {
+                                        AutorDTO nomeAutor) {
 }
